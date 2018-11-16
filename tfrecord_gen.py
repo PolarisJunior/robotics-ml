@@ -4,6 +4,9 @@ import dataset_util
 import tensorflow as tf
 import io
 
+RECORD_PATH = os.path.join(".", "records")
+RECORD_FILE_NAME = "robot_plates.record"
+
 def get_box_corners(box_dict):
     return {
         "xmin": float(box_dict["left"]),
@@ -68,12 +71,15 @@ def json_to_record(j):
 
 def convert_files_to_record(n = None):
     i = 0
+    writer = tf.python_io.TFRecordWriter(os.path.join(RECORD_PATH, RECORD_FILE_NAME))
     for file_name in os.listdir(XML_PATH):
         j = file_name_to_json(file_name)
-        record = json_to_record(j)
+        tf_example = json_to_record(j)
+        writer.write(tf_example.SerializeToString())
         i += 1
         if n is not None and i >= n:
             break
+    writer.close()
     pass
 
-convert_files_to_record(n = 1)
+convert_files_to_record()
