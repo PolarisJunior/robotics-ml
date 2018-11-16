@@ -53,6 +53,18 @@ def xml_dict_to_json(xml_dict):
     return j
     pass
 
+def file_name_to_dict(file_name):
+    with open(os.path.join(XML_PATH, file_name), "r") as f:
+        xml_string = f.read()
+        xml_dict = xmltodict.parse(xml_string)
+        return xml_dict
+    print("Error opening file", file_name)
+
+def file_name_to_json(file_name):
+    xml_dict = file_name_to_dict(file_name)
+    return xml_dict_to_json(xml_dict)
+
+
 def convert():
     for file_name in os.listdir(XML_PATH):
         with open(os.path.join(XML_PATH, file_name), "r") as f:
@@ -64,4 +76,4 @@ def convert():
             f.write(json.dumps(json_string, indent=4))
         pass
 
-convert()
+# convert()
