@@ -11,12 +11,17 @@ OUT_PATH = os.path.join(".", "out")
 CLASSES = ["blue4", "red4"]
 CLASSES_MAP = {"blue4": 0, "red4": 1}
 CLASS_IDS = [0, 1]
+CLASS_IDS_MAP = { 0: "blue4", 1: "red4" }
 
 def class_name_fix(class_name):
     if class_name == "blue4ww":
         return "blue4"
     return class_name
     pass
+
+def class_id_to_name(cid):
+    return CLASS_IDS_MAP[cid]
+
 
 def xml_dict_to_json(xml_dict):
     j = {}
