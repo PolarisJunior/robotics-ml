@@ -1,5 +1,8 @@
 
 from dataset_format import *
+import dataset_util
+import tensorflow as tf
+import io
 
 def get_box_corners(box_dict):
     return {
@@ -14,13 +17,16 @@ def json_to_record(j):
     assert(len(j["categories"]) == len(j["annotations"]))
 
     image_size = j["image_size"][0]
-    height = float(image_size["height"])
-    width = float(image_size["width"])
+    height = image_size["height"]
+    width = image_size["width"]
 
     filename = os.path.basename(j["file"])
 
-    # what is this
-    encoded_image_data = None
+    # actual image bytes? refer to dataset_tools/create_pet_tf_record.py
+    with tf.gfile.GFile(os.path.join(IMAGE_PATH, filename), "rb") as fid:
+        encoded_jpg = fid.read()
+        pass
+    encoded_image_data = encoded_jpg
     image_format = b'jpeg'
 
     xmins = []
@@ -30,11 +36,11 @@ def json_to_record(j):
 
     classes_text = []
     classes = []
-
-    # class_ids are indexed by 1 for tensorflow
+    
     for annot in j["annotations"]:
         c_name = class_id_to_name(annot["class_id"])
-        classes_text.append(c_name)
+        classes_text.append(c_name.encode("utf8"))
+        # class_ids are indexed by 1 for tensorflow
         classes.append(annot["class_id"] + 1)
         corners = get_box_corners(annot)
         xmins.append(corners["xmin"] / width)
@@ -42,7 +48,22 @@ def json_to_record(j):
         ymins.append(corners["ymin"] / height)
         ymaxs.append(corners["ymax"] / height)
 
-    return j
+    tf_example = tf.train.Example(features=tf.train.Features(feature={
+        'image/height': dataset_util.int64_feature(height),
+        'image/width': dataset_util.int64_feature(width),
+        'image/filename': dataset_util.bytes_feature(filename.encode("utf8")),
+        'image/source_id': dataset_util.bytes_feature(filename.encode("utf8")),
+        'image/encoded': dataset_util.bytes_feature(encoded_image_data),
+        'image/format': dataset_util.bytes_feature(image_format),
+        'image/object/bbox/xmin': dataset_util.float_list_feature(xmins),
+        'image/object/bbox/xmax': dataset_util.float_list_feature(xmaxs),
+        'image/object/bbox/ymin': dataset_util.float_list_feature(ymins),
+        'image/object/bbox/ymax': dataset_util.float_list_feature(ymaxs),
+        'image/object/class/text': dataset_util.bytes_list_feature(classes_text),
+        'image/object/class/label': dataset_util.int64_list_feature(classes),
+    }))    
+    # print(tf_example)
+    return tf_example
     pass
 
 def convert_files_to_record(n = None):
