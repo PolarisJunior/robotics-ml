@@ -2,7 +2,7 @@
 
 INPUT_TYPE=image_tensor
 PIPELINE_CONFIG_PATH=./robot_plate.config
-TRAINED_CKPT_PREFIX=./model.ckpt
+TRAINED_CKPT_PREFIX=./model.ckpt-30
 EXPORT_DIR=./robot_export/
 python object_detection/export_inference_graph.py \
     --input_type=${INPUT_TYPE} \

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-PIPELINE_CONFIG_PATH=./
-MODEL_DIR=./
+PIPELINE_CONFIG_PATH=./robot_plate.config
+MODEL_DIR=./robot_out/
 NUM_TRAIN_STEPS=30
 SAMPLE_1_OF_N_EVAL_EXAMPLES=1
 python object_detection/model_main.py \
