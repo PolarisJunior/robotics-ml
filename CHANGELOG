@@ -1,0 +1,5 @@
+
+
+regarding tensorflow object detection:
+    wrap in list() category_index.values() around line 418 of models_util.py 
+    eval_util_test.py change iteritems to items()

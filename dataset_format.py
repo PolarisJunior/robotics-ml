@@ -58,15 +58,15 @@ def xml_dict_to_json(xml_dict):
     return j
     pass
 
-def file_name_to_dict(file_name):
-    with open(os.path.join(XML_PATH, file_name), "r") as f:
+def file_name_to_dict(file_name, xml_path=XML_PATH):
+    with open(os.path.join(xml_path, file_name), "r") as f:
         xml_string = f.read()
         xml_dict = xmltodict.parse(xml_string)
         return xml_dict
     print("Error opening file", file_name)
 
-def file_name_to_json(file_name):
-    xml_dict = file_name_to_dict(file_name)
+def file_name_to_json(file_name, xml_path=XML_PATH):
+    xml_dict = file_name_to_dict(file_name, xml_path=xml_path)
     return xml_dict_to_json(xml_dict)
 
 

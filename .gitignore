@@ -2,3 +2,5 @@ out/
 models/
 gen/
 big_dataset/
+test/
+records/
