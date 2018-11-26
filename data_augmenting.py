@@ -8,7 +8,7 @@
     3. save the images
  """
 
-from PIL import Image
+from PIL import Image, ImageDraw, ImageChops
 import numpy as np
 import os
 from metrics import box_overlaps_regions
@@ -121,11 +121,36 @@ class ManipPipeline(ImageManip):
         pass
 
 class ContrastManip(ImageManip):
-    def __init__(self, magnitude):
+    # TODO implement neg_mag (will slow down significantly so maybe give an option to disable)
+    def __init__(self, pos_mag, neg_mag):
+        self.pos_mag = pos_mag
+        self.neg_mag = neg_mag
+
+        self.blue_class_id = 0
+        self.red_class_id = 1
         pass
 
     def manip(self, image, json):
+        width = image.width
+        height = image.height
+        add_layer = Image.new("RGB", (width, height), (0, 0, 0))
+        draw_layer = ImageDraw.Draw(add_layer)
+
+        for annot in json["annotations"]:
+            r, g, b = (0, 0, 0)
+            pos_0 = (annot["left"], annot["top"])
+            pos_1 = (annot["left"] + annot["width"], annot["top"] + annot["height"])
+            if annot["class_id"] == self.blue_class_id:
+                b = self.pos_mag
+            if annot["class_id"] == self.red_class_id:
+                r = self.pos_mag
+            draw_layer.rectangle([pos_0, pos_1], fill=(r, g, b))                
+            pass
+
+        image = ImageChops.add(image, add_layer)
+        return image, json
         pass
+
 
 
 
@@ -179,9 +204,12 @@ np.random.shuffle(jsons)
 
 background = Image.open(os.path.join(BACKGROUND_PATH, "Forest-Trees.jpg"), "r")
 
+c_manip = ContrastManip(30, 30)
 b_manip = BackgroundManip(BACKGROUND_PATH, circular=True, border_size=30)
 g_manip = GaussianManip(0, 1000)
+
 p_manip = ManipPipeline()
+p_manip.append_chain(c_manip)
 p_manip.append_chain(b_manip)
 p_manip.append_chain(g_manip)
 
