@@ -1,6 +1,8 @@
 
 import numpy as np
 
+NUM_CLASSES = 2
+
 def is_above(rect1, rect2):
     # y1 + height < y2
     return rect1[3] + rect1[1] < rect2[1]
@@ -26,4 +28,17 @@ def box_overlaps_regions(box, regions):
             return True
         pass
     return False
+    pass
+
+""" takes json and returns 2d vec representing
+    count of blue and red annotations """
+def vectorize_json(json):
+    vec = np.zeros(NUM_CLASSES)
+    for annot in json["annotations"]:
+        vec[annot["class_id"]] += 1
+        pass
+    return vec
+    pass
+
+def naive_classification_accuracy(actual_json, predict_json):
     pass
