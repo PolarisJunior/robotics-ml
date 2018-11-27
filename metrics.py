@@ -30,15 +30,33 @@ def box_overlaps_regions(box, regions):
     return False
     pass
 
-""" takes json and returns 2d vec representing
+""" takes dict and returns 2d vec representing
     count of blue and red annotations """
-def vectorize_json(json):
+def vectorize_dict(dict):
     vec = np.zeros(NUM_CLASSES)
-    for annot in json["annotations"]:
+    for annot in dict["annotations"]:
         vec[annot["class_id"]] += 1
         pass
     return vec
     pass
 
-def naive_classification_accuracy(actual_json, predict_json):
+""" calculates sum of difference between # of predicted classes
+    and # of actual classes for each image """
+def naive_classification_accuracy(actual_dicts, predict_dicts):
+    sum_predictions = np.zeros(NUM_CLASSES)
+    sum_actuals = np.zeros(NUM_CLASSES)
+    dif_sum = np.zeros(NUM_CLASSES)
+    for actual, predict in zip(actual_dicts, predict_dicts):
+        vec_predict = vectorize_dict(predict)
+        vec_actual = vectorize_dict(actual)
+
+        sum_predictions += vec_predict
+        sum_actuals += vec_actual
+
+        dif_sum += np.abs(vec_predict - vec_actual)
+        pass
+    print(sum_predictions)
+    print(dif_sum)
+    print(sum_predictions / sum_predictions)
+    return dif_sum
     pass

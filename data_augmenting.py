@@ -11,7 +11,7 @@
 from PIL import Image, ImageDraw, ImageChops
 import numpy as np
 import os
-from metrics import box_overlaps_regions
+from metrics import box_overlaps_regions, naive_classification_accuracy
 from dataset_format import file_name_to_json
 from json import dump
 
@@ -20,6 +20,8 @@ IMAGE_PATH = os.path.join(".", "big_dataset", "train_plate")
 OUT_PATH = os.path.join(".", "out")
 TEST_PATH = os.path.join(".", "test")
 BACKGROUND_PATH = os.path.join(".", "backgrounds")
+
+OUTPUT_PREFIX = "test"
 
 """ base class for image manipulation strategies """
 class ImageManip():
@@ -204,7 +206,7 @@ np.random.shuffle(jsons)
 
 background = Image.open(os.path.join(BACKGROUND_PATH, "Forest-Trees.jpg"), "r")
 
-c_manip = ContrastManip(30, 30)
+c_manip = ContrastManip(0, 0)
 b_manip = BackgroundManip(BACKGROUND_PATH, circular=True, border_size=30)
 g_manip = GaussianManip(0, 1000)
 
@@ -217,7 +219,7 @@ i = 0
 for image, json in zip(images, jsons):
     a_image, j_image = p_manip.manip(image, json)
     # file = file_no_ext(os.path.basename(json["file"])) + "_aug"
-    file = "test_{}".format(i)
+    file = "{}_{}".format(OUTPUT_PREFIX, i)
     image_path = os.path.join(TEST_PATH, file + ".jpg")
     a_image.save(image_path)
 
@@ -230,3 +232,5 @@ for image, json in zip(images, jsons):
     i += 1
     if i > 5:
         break
+
+naive_classification_accuracy(jsons[:7], jsons[:7])

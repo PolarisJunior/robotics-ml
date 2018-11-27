@@ -26,7 +26,7 @@ from utils import visualization_utils as vis_util
 SHOW_VISUALS = True
 
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
-PATH_TO_FROZEN_GRAPH = os.path.join(".", "robot_export", 'frozen_inference_graph.pb')
+PATH_TO_FROZEN_GRAPH = os.path.join(".", "robot_export2", 'frozen_inference_graph.pb')
 
 # List of the strings that is used to add correct label for each box.
 PATH_TO_LABELS = os.path.join('data', 'robot_label_map.pbtxt')
@@ -54,7 +54,8 @@ def load_image_into_numpy_array(image):
 # If you want to test the code with your images, just add path to the images to the TEST_IMAGE_PATHS.
 PATH_TO_TEST_IMAGES_DIR = 'test_images'
 # TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'image{}.jpg'.format(i)) for i in range(1, 3) ]
-TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'red_bot_2_{}.jpg'.format(i)) for i in range(238, 240) ]
+# TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'red_bot_2_{}.jpg'.format(i)) for i in range(238, 240) ]
+TEST_IMAGE_PATHS = []
 # TEST_IMAGE_PATHS.append(os.path.join(PATH_TO_TEST_IMAGES_DIR, "blue_bot_1_1_aug.jpg"))
 TEST_IMAGE_PATHS += [os.path.join(PATH_TO_TEST_IMAGES_DIR, "test_{}.jpg".format(i)) for i in range(0, 7)]
 
@@ -119,6 +120,11 @@ for image_path in TEST_IMAGE_PATHS:
   image_np_expanded = np.expand_dims(image_np, axis=0)
   # Actual detection.
   output_dict = run_inference_for_single_image(image_np, detection_graph)
+  
+  sys.stdout.flush()
+  print(output_dict)
+  print(len(output_dict["detection_classes"]))
+  sys.stdout.flush()
   # Visualization of the results of a detection.
   vis_util.visualize_boxes_and_labels_on_image_array(
       image_np,
@@ -129,6 +135,7 @@ for image_path in TEST_IMAGE_PATHS:
       instance_masks=output_dict.get('detection_masks'),
       use_normalized_coordinates=True,
       line_thickness=8)
+
   plt.figure(figsize=IMAGE_SIZE)  
   plt.imshow(image_np)
   plt.show()
