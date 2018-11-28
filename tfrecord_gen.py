@@ -3,9 +3,12 @@ from dataset_format import *
 import dataset_util
 import tensorflow as tf
 import io
+import numpy as np
 
 RECORD_PATH = os.path.join(".", "records")
-RECORD_FILE_NAME = "robot_plates.record"
+# RECORD_FILE_NAME = "robot_plates.record"
+EVAL_RECORD_FILE_NAME = "robot_plates_eval.record"
+TRAIN_RECORD_FILE_NAME = "robot_plates_train.record"
 
 def get_box_corners(box_dict):
     return {
@@ -69,17 +72,32 @@ def json_to_record(j):
     return tf_example
     pass
 
-def convert_files_to_record(n = None):
-    i = 0
-    writer = tf.python_io.TFRecordWriter(os.path.join(RECORD_PATH, RECORD_FILE_NAME))
-    for file_name in os.listdir(XML_PATH):
+def convert_files_to_record(train_size=5000, eval_size=250):
+    assert(len(os.listdir(XML_PATH)) >= train_size + eval_size)
+    file_names = os.listdir(XML_PATH)
+    arrangement = np.arange(0, len(file_names), 1, dtype="int")
+    np.random.shuffle(arrangement)
+    train_indices = arrangement[:train_size]
+    eval_indices = arrangement[train_size:train_size + eval_size]
+
+    print("Creating n = {} Training Record".format(train_size))
+    writer = tf.python_io.TFRecordWriter(os.path.join(RECORD_PATH, TRAIN_RECORD_FILE_NAME))
+    for idx in train_indices:
+        file_name = file_names[idx]
         j = file_name_to_json(file_name)
         tf_example = json_to_record(j)
         writer.write(tf_example.SerializeToString())
-        i += 1
-        if n is not None and i >= n:
-            break
+    writer.close()
+
+    print("Creating n = {} Eval Record".format(eval_size))
+    writer = tf.python_io.TFRecordWriter(os.path.join(RECORD_PATH, EVAL_RECORD_FILE_NAME))
+    for idx in eval_indices:
+        file_name = file_names[idx]
+        j = file_name_to_json(file_name)
+        tf_example = json_to_record(j)
+        writer.write(tf_example.SerializeToString())
     writer.close()
     pass
+
 
 convert_files_to_record()
