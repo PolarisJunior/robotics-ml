@@ -1,5 +1,6 @@
 
 
 regarding tensorflow object detection:
-    wrap in list() category_index.values() around line 418 of models_util.py 
+    wrap in list() category_index.values() around line 418 of models_lib.py 
     eval_util_test.py change iteritems to items()
+    tf.logging.set_verbosity(tf.logging.INFO) in  model_main.py
