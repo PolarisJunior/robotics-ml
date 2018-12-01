@@ -7,8 +7,8 @@ import numpy as np
 
 RECORD_PATH = os.path.join(".", "records")
 # RECORD_FILE_NAME = "robot_plates.record"
-EVAL_RECORD_FILE_NAME = "robot_plates_eval.record"
-TRAIN_RECORD_FILE_NAME = "robot_plates_train.record"
+EVAL_RECORD_FILE_NAME = "gaussian_robot_plates_eval.record"
+TRAIN_RECORD_FILE_NAME = "gaussian_robot_plates_train.record"
 
 def get_box_corners(box_dict):
     return {
@@ -29,7 +29,7 @@ def json_to_record(j):
     filename = os.path.basename(j["file"])
 
     # actual image bytes? refer to dataset_tools/create_pet_tf_record.py
-    with tf.gfile.GFile(os.path.join(IMAGE_PATH, filename), "rb") as fid:
+    with tf.gfile.GFile(j["file"], "rb") as fid:
         encoded_jpg = fid.read()
         pass
     encoded_image_data = encoded_jpg
@@ -99,5 +99,34 @@ def convert_files_to_record(train_size=5000, eval_size=250):
     writer.close()
     pass
 
+def convert_json_files_to_record(train_size=5000, eval_size=250):
+    assert(len(os.listdir(JSON_PATH)) >= train_size + eval_size)
+    file_names = os.listdir(JSON_PATH)
 
-convert_files_to_record()
+    arrangement = np.arange(0, len(file_names), 1, dtype="int")
+    np.random.shuffle(arrangement)
+
+    train_indices = arrangement[:train_size]
+    eval_indices = arrangement[train_size:train_size + eval_size]
+    print("Creating n = {} Training Record".format(train_size))
+    writer = tf.python_io.TFRecordWriter(os.path.join(RECORD_PATH, TRAIN_RECORD_FILE_NAME))
+    for idx in train_indices:
+        file_name = file_names[idx]
+        j = json.load(open(os.path.join(JSON_PATH, file_name)))
+        tf_example = json_to_record(j)
+        writer.write(tf_example.SerializeToString())
+    writer.close()
+
+    print("Creating n = {} Eval Record".format(eval_size))
+    writer = tf.python_io.TFRecordWriter(os.path.join(RECORD_PATH, EVAL_RECORD_FILE_NAME))
+    for idx in eval_indices:
+        file_name = file_names[idx]
+        j = json.load(open(os.path.join(JSON_PATH, file_name)))
+        tf_example = json_to_record(j)
+        writer.write(tf_example.SerializeToString())
+        pass
+    writer.close()
+    pass
+
+# convert_files_to_record()
+convert_json_files_to_record()
