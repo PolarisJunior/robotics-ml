@@ -18,10 +18,10 @@ from json import dump
 XML_PATH = "./big_dataset/train_xml"
 IMAGE_PATH = os.path.join(".", "big_dataset", "train_plate")
 OUT_PATH = os.path.join(".", "out")
-TEST_PATH = os.path.join(".", "test")
+TEST_PATH = os.path.join(".", "gaussian")
 BACKGROUND_PATH = os.path.join(".", "backgrounds")
 
-OUTPUT_PREFIX = "test"
+OUTPUT_PREFIX = "gaussian"
 
 """ base class for image manipulation strategies """
 class ImageManip():
@@ -188,21 +188,35 @@ def randomly_place_boxes(container_width, container_height, dims):
     return boxes
     pass
 
-jsons = []
-images = []
+def sample_generator():
+    file_names = os.listdir(XML_PATH)
+    np.random.shuffle(file_names)
 
-for file_name in os.listdir(XML_PATH):
-    jsons.append(file_name_to_json(file_name))
-    img_file_name = file_no_ext(file_name) + ".jpg"
-    # print(img_file_name)
-    img = Image.open(os.path.join(IMAGE_PATH, img_file_name), "r")
-    images.append(img)
+    for file_name in file_names:
+        json = file_name_to_json(file_name)
+        img_file_name = file_no_ext(file_name) + ".jpg"
+        img = Image.open(os.path.join(IMAGE_PATH, img_file_name), "r")
+
+        yield img, json
+    
+    pass
+
+# jsons = []
+# images = []
+
+# for file_name in os.listdir(XML_PATH):
+#     jsons.append(file_name_to_json(file_name))
+#     img_file_name = file_no_ext(file_name) + ".jpg"
+    
+#     img = Image.open(os.path.join(IMAGE_PATH, img_file_name), "r")
+#     images.append(img)
+
 
 # images, jsons = shuffle()
-state = np.random.get_state()
-np.random.shuffle(images)
-np.random.set_state(state)
-np.random.shuffle(jsons)
+# state = np.random.get_state()
+# np.random.shuffle(images)
+# np.random.set_state(state)
+# np.random.shuffle(jsons)
 
 background = Image.open(os.path.join(BACKGROUND_PATH, "Forest-Trees.jpg"), "r")
 
@@ -211,26 +225,46 @@ b_manip = BackgroundManip(BACKGROUND_PATH, circular=True, border_size=30)
 g_manip = GaussianManip(0, 1000)
 
 p_manip = ManipPipeline()
-p_manip.append_chain(c_manip)
-p_manip.append_chain(b_manip)
+# p_manip.append_chain(c_manip)
+# p_manip.append_chain(b_manip)
 p_manip.append_chain(g_manip)
 
-i = 0
-for image, json in zip(images, jsons):
-    a_image, j_image = p_manip.manip(image, json)
-    # file = file_no_ext(os.path.basename(json["file"])) + "_aug"
-    file = "{}_{}".format(OUTPUT_PREFIX, i)
-    image_path = os.path.join(TEST_PATH, file + ".jpg")
-    a_image.save(image_path)
+# i = 0
+# for image, json in zip(images, jsons):
+#     a_image, j_image = p_manip.manip(image, json)
+#     # file = file_no_ext(os.path.basename(json["file"])) + "_aug"
+#     file = "{}_{}".format(OUTPUT_PREFIX, i)
+#     image_path = os.path.join(TEST_PATH, file + ".jpg")
+#     a_image.save(image_path)
 
-    image_dir = os.path.dirname(image_path)
-    json["file"] = os.path.join(image_dir, file + ".json")
+#     image_dir = os.path.dirname(image_path)
+#     json["file"] = os.path.join(image_dir, file + ".json")
         
-    with open(os.path.join(TEST_PATH, file + ".json"), "w") as f:
-        dump(json, f, indent=4)
-        pass
-    i += 1
-    if i > 5:
-        break
+#     with open(os.path.join(TEST_PATH, file + ".json"), "w") as f:
+#         dump(json, f, indent=4)
+#         pass
+#     i += 1
+#     """ if i > 5:
+#         break """
 
-naive_classification_accuracy(jsons[:7], jsons[:7])
+def run_on_all_images():
+    i = 0
+    for image, json in sample_generator():
+        # note that dicts are pass by reference
+        a_image, _ = p_manip.manip(image, json)
+
+        file_name = "{}_{}".format(OUTPUT_PREFIX, i)
+
+        image_path = os.path.join(TEST_PATH, "image", file_name + ".jpg")
+        a_image.save(image_path)
+
+        json["file"] = image_path
+        with open(os.path.join(TEST_PATH, "json", file_name + ".json"), "w") as f:
+            dump(json, f, indent = 4)
+        image.close()
+        i += 1
+        # if i > 5
+        #     break
+
+run_on_all_images()
+# naive_classification_accuracy(jsons[:7], jsons[:7])

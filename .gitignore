@@ -4,3 +4,12 @@ gen/
 big_dataset/
 test/
 records/
+big_dataset/
+drive_around/
+gaussian/
+gen/
+models/
+out/
+records/
+test/
+backgrounds/

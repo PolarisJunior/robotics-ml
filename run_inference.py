@@ -26,7 +26,7 @@ from utils import visualization_utils as vis_util
 SHOW_VISUALS = True
 
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
-PATH_TO_FROZEN_GRAPH = os.path.join(".", "robot_export2", 'frozen_inference_graph.pb')
+PATH_TO_FROZEN_GRAPH = os.path.join(".", "basic_robot_200000", 'frozen_inference_graph.pb')
 
 # List of the strings that is used to add correct label for each box.
 PATH_TO_LABELS = os.path.join('data', 'robot_label_map.pbtxt')
@@ -53,11 +53,13 @@ def load_image_into_numpy_array(image):
 # image2.jpg
 # If you want to test the code with your images, just add path to the images to the TEST_IMAGE_PATHS.
 PATH_TO_TEST_IMAGES_DIR = 'test_images'
-# TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'image{}.jpg'.format(i)) for i in range(1, 3) ]
-# TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'red_bot_2_{}.jpg'.format(i)) for i in range(238, 240) ]
-TEST_IMAGE_PATHS = []
+drive_indices = [120, 245, 285, 720, 850]
+# TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'image{}.jpg'.format(i)) for i in range(1, 10) ]
+# TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'blue_bot_1_{}.jpg'.format(i)) for i in range(1, 9) ]
+TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'blue_drive_{}.jpg'.format(i)) for i in drive_indices ]
+# TEST_IMAGE_PATHS = [os.path.join(PATH_TO_TEST_IMAGES_DIR, "blue_bot_1_{}_aug.jpg".format(i)) for i in range(100, 105)]
 # TEST_IMAGE_PATHS.append(os.path.join(PATH_TO_TEST_IMAGES_DIR, "blue_bot_1_1_aug.jpg"))
-TEST_IMAGE_PATHS += [os.path.join(PATH_TO_TEST_IMAGES_DIR, "test_{}.jpg".format(i)) for i in range(0, 7)]
+""" TEST_IMAGE_PATHS += [os.path.join(PATH_TO_TEST_IMAGES_DIR, "test_{}.jpg".format(i)) for i in range(0, 7)] """
 
 # Size, in inches, of the output images.
 IMAGE_SIZE = (12, 8)
