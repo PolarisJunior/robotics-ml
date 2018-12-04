@@ -111,7 +111,7 @@ class BackgroundManip(ImageManip):
         max_cropped_width = max(dims, key=itemgetter(0))[0]
         max_cropped_height = max(dims, key=itemgetter(1))[1]
         while (max_cropped_width >= b_width or max_cropped_height >= b_height):
-            cropped_imgs, dims = self.resize_images(cropped_imgs)
+            cropped_imgs, dims = self.resize_images(cropped_imgs, dims)
             max_cropped_width = max(dims, key=itemgetter(0))[0]
             max_cropped_height = max(dims, key=itemgetter(1))[1]
             self.num_resizes += 1
@@ -120,25 +120,32 @@ class BackgroundManip(ImageManip):
         # find box placement or scale down if couldn't find placement
         boxes = randomly_place_boxes(b_width, b_height, dims)
         while boxes is None:
-            cropped_imgs, dims = self.resize_images(cropped_imgs)
-            boxes = randomly_place_boxes(b_width, b_height, dims)
             self.num_resizes += 1
             print(self.num_resizes, self.idx)
+            cropped_imgs, dims = self.resize_images(cropped_imgs, dims)
+            boxes = randomly_place_boxes(b_width, b_height, dims)
+            print(dims)
+            print(boxes)
             pass
 
         # paste images and update dict
         for cropped_img, box, annot in zip(cropped_imgs, boxes, json["annotations"]):
-            background.paste(cropped_img, (box[0] - self.border_size, box[1] - self.border_size))
+            background.paste(
+                cropped_img, (box[0] - self.border_size, box[1] - self.border_size))
             annot["left"] = box[0]
             annot["top"] = box[1]
+            annot["width"] = box[2]
+            annot["height"] = box[3]
 
         return background, json
         pass
 
-    def resize_images(self, images, scale_factor=0.75):
+    def resize_images(self, images, dims, scale_factor=0.75):
+        dims = [(int(float(width) * scale_factor),
+                 int(float(height) * scale_factor)) for width, height in dims]
         resized_images = [img.resize(
-            (int(img.width*scale_factor), int(img.height*scale_factor))) for img in images]
-        dims = [(img.width, img.height) for img in resized_images]
+            (int(float(img.width)*scale_factor), int(float(img.height)*scale_factor))) for img in images]
+        # dims = [(img.width, img.height) for img in resized_images]
         return (resized_images, dims)
 
     def next_background(self):
@@ -289,28 +296,10 @@ p_manip = ManipPipeline()
 p_manip.append_chain(b_manip)
 p_manip.append_chain(g_manip)
 
-# i = 0
-# for image, json in zip(images, jsons):
-#     a_image, j_image = p_manip.manip(image, json)
-#     # file = file_no_ext(os.path.basename(json["file"])) + "_aug"
-#     file = "{}_{}".format(OUTPUT_PREFIX, i)
-#     image_path = os.path.join(TEST_PATH, file + ".jpg")
-#     a_image.save(image_path)
-
-#     image_dir = os.path.dirname(image_path)
-#     json["file"] = os.path.join(image_dir, file + ".json")
-
-#     with open(os.path.join(TEST_PATH, file + ".json"), "w") as f:
-#         dump(json, f, indent=4)
-#         pass
-#     i += 1
-#     """ if i > 5:
-#         break """
-
 
 def run_on_all_images():
     i = 0
-    DEBUG = False
+    DEBUG = True
     for image, json in sample_generator():
         # note that dicts are pass by reference
         a_image, _ = p_manip.manip(image, json)
