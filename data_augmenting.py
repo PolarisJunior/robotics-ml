@@ -54,7 +54,10 @@ class GaussianManip(ImageManip):
         noise = np.random.normal(
             loc=self.mu, scale=self.stddev, size=(image.height, image.width, 3))
 
-        res = image + noise
+        try:
+            res = image + noise
+        except:
+            return image, json_dat
         np.clip(res, 0, 255, out=res)
 
         return Image.fromarray(np.uint8(res), "RGB"), json_dat
@@ -83,6 +86,7 @@ class BackgroundManip(ImageManip):
 
         self.idx = 0
         self.circular = circular
+
         self.num_resizes = 0
         pass
 
@@ -107,24 +111,24 @@ class BackgroundManip(ImageManip):
         max_cropped_width = max(dims, key=itemgetter(0))[0]
         max_cropped_height = max(dims, key=itemgetter(1))[1]
         while (max_cropped_width >= b_width or max_cropped_height >= b_height):
-            cropped_imgs, dims = self.resize_images(self, cropped_imgs)
+            cropped_imgs, dims = self.resize_images(cropped_imgs)
             max_cropped_width = max(dims, key=itemgetter(0))[0]
             max_cropped_height = max(dims, key=itemgetter(1))[1]
             self.num_resizes += 1
-            print(self.num_resizes)
+            print(self.num_resizes, self.idx)
 
         # find box placement or scale down if couldn't find placement
         boxes = randomly_place_boxes(b_width, b_height, dims)
         while boxes is None:
-            cropped_imgs, dims = self.resize_images(self, cropped_imgs)
+            cropped_imgs, dims = self.resize_images(cropped_imgs)
             boxes = randomly_place_boxes(b_width, b_height, dims)
             self.num_resizes += 1
-            print(self.num_resizes)
+            print(self.num_resizes, self.idx)
             pass
 
         # paste images and update dict
         for cropped_img, box, annot in zip(cropped_imgs, boxes, json["annotations"]):
-            background.paste(cropped_img, (box[0], box[1]))
+            background.paste(cropped_img, (box[0] - self.border_size, box[1] - self.border_size))
             annot["left"] = box[0]
             annot["top"] = box[1]
 
@@ -133,7 +137,7 @@ class BackgroundManip(ImageManip):
 
     def resize_images(self, images, scale_factor=0.75):
         resized_images = [img.resize(
-            int(img.width*scale_factor), int(img.height*scale_factor)) for img in images]
+            (int(img.width*scale_factor), int(img.height*scale_factor))) for img in images]
         dims = [(img.width, img.height) for img in resized_images]
         return (resized_images, dims)
 
@@ -212,11 +216,10 @@ def file_no_ext(file_name):
 """  takes a width and height for a rectangle 
     and a list of (width, height) and returns a list of
     non overlapping boxes inside the rectangle dims 
-    
-    WARNING, this assumes it has enough room to place all the boxes"""
 
-
-""" Returns None if boxes cant be placed """
+ Returns None if boxes cant be placed, 
+ dims = list of bounding box dimensions
+ returns boxes with the same size as the supplied by dims """
 
 
 def randomly_place_boxes(container_width, container_height, dims):
@@ -307,6 +310,7 @@ p_manip.append_chain(g_manip)
 
 def run_on_all_images():
     i = 0
+    DEBUG = False
     for image, json in sample_generator():
         # note that dicts are pass by reference
         a_image, _ = p_manip.manip(image, json)
@@ -314,12 +318,21 @@ def run_on_all_images():
         file_name = "{}_{}".format(OUTPUT_PREFIX, i)
 
         image_path = os.path.join(TEST_PATH, "image", file_name + ".jpg")
+        if DEBUG:
+            draw = ImageDraw.Draw(a_image)
+            for annot in json["annotations"]:
+                draw.rectangle([(annot["left"], annot["top"]),
+                                (annot["left"] + annot["width"],
+                                 annot["top"] + annot["height"])], outline=(0, 255, 0))
+
         a_image.save(image_path)
 
         json["file"] = image_path
         with open(os.path.join(TEST_PATH, "json", file_name + ".json"), "w") as f:
             dump(json, f, indent=4)
         image.close()
+        if i % 200 == 199:
+            print("Iteration %d" % (i))
         i += 1
         if i > 100:
             break
