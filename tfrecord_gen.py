@@ -7,8 +7,8 @@ import numpy as np
 
 RECORD_PATH = os.path.join(".", "records")
 # RECORD_FILE_NAME = "robot_plates.record"
-EVAL_RECORD_FILE_NAME = "gaussian_robot_plates_eval.record"
-TRAIN_RECORD_FILE_NAME = "gaussian_robot_plates_train.record"
+EVAL_RECORD_FILE_NAME = "mixed_robot_plates_eval.record"
+TRAIN_RECORD_FILE_NAME = "mixed_robot_plates_train.record"
 
 def get_box_corners(box_dict):
     return {

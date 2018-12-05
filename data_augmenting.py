@@ -23,10 +23,10 @@ from operator import itemgetter
 XML_PATH = "./big_dataset/train_xml"
 IMAGE_PATH = os.path.join(".", "big_dataset", "train_plate")
 OUT_PATH = os.path.join(".", "out")
-TEST_PATH = os.path.join(".", "transposed")
+TEST_PATH = os.path.join(".", "mixed")
 BACKGROUND_PATH = os.path.join(".", "backgrounds")
 
-OUTPUT_PREFIX = "transposed"
+OUTPUT_PREFIX = "mixed"
 
 """ base class for image manipulation strategies """
 
@@ -114,18 +114,16 @@ class BackgroundManip(ImageManip):
             cropped_imgs, dims = self.resize_images(cropped_imgs, dims)
             max_cropped_width = max(dims, key=itemgetter(0))[0]
             max_cropped_height = max(dims, key=itemgetter(1))[1]
-            self.num_resizes += 1
             print(self.num_resizes, self.idx)
+            self.num_resizes += 1
 
         # find box placement or scale down if couldn't find placement
         boxes = randomly_place_boxes(b_width, b_height, dims)
         while boxes is None:
-            self.num_resizes += 1
             print(self.num_resizes, self.idx)
             cropped_imgs, dims = self.resize_images(cropped_imgs, dims)
             boxes = randomly_place_boxes(b_width, b_height, dims)
-            print(dims)
-            print(boxes)
+            self.num_resizes += 1
             pass
 
         # paste images and update dict
@@ -289,7 +287,7 @@ def sample_generator():
 
 c_manip = ContrastManip(0, 0)
 b_manip = BackgroundManip(BACKGROUND_PATH, circular=True, border_size=30)
-g_manip = GaussianManip(0, 1000)
+g_manip = GaussianManip(0, 100)
 
 p_manip = ManipPipeline()
 # p_manip.append_chain(c_manip)
@@ -297,10 +295,12 @@ p_manip.append_chain(b_manip)
 p_manip.append_chain(g_manip)
 
 
+
 def run_on_all_images():
     i = 0
-    DEBUG = True
+    DEBUG = False
     for image, json in sample_generator():
+        
         # note that dicts are pass by reference
         a_image, _ = p_manip.manip(image, json)
 
@@ -323,9 +323,55 @@ def run_on_all_images():
         if i % 200 == 199:
             print("Iteration %d" % (i))
         i += 1
-        if i > 100:
+        if i > 6000:
             break
 
 
-run_on_all_images()
+# run_on_all_images()
 # naive_classification_accuracy(jsons[:7], jsons[:7])
+
+def run_on_all_images_mixed():
+    i = 0
+    DEBUG = False
+    manip_tally = [0, 0, 0, 0]
+    for image, json in sample_generator():
+        rnd = np.random.rand()
+        # note that dicts are pass by reference
+        if rnd < .2:
+            a_image, _ = image, json
+            manip_tally[0] += 1
+        elif rnd < .3:
+            a_image, _ = g_manip.manip(image, json)
+            manip_tally[1] += 1
+        elif rnd <= .5:
+            a_image, _ = p_manip.manip(image, json)
+            manip_tally[2] += 1
+        else:
+            a_image, _ = b_manip.manip(image, json)
+            manip_tally[3] += 1
+
+        file_name = "{}_{}".format(OUTPUT_PREFIX, i)
+
+        image_path = os.path.join(TEST_PATH, "image", file_name + ".jpg")
+        if DEBUG:
+            draw = ImageDraw.Draw(a_image)
+            for annot in json["annotations"]:
+                draw.rectangle([(annot["left"], annot["top"]),
+                                (annot["left"] + annot["width"],
+                                 annot["top"] + annot["height"])], outline=(0, 255, 0))
+
+        a_image.save(image_path)
+
+        json["file"] = image_path
+        with open(os.path.join(TEST_PATH, "json", file_name + ".json"), "w") as f:
+            dump(json, f, indent=4)
+        image.close()
+        if i % 200 == 199:
+            print("Iteration %d" % (i))
+        i += 1
+        # print(manip_tally)
+        if i > 6000:
+            break    
+    pass
+
+run_on_all_images_mixed()

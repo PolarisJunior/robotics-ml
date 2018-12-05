@@ -4,10 +4,10 @@ import xmltodict
 import os
 import json
 
-XML_PATH = os.path.join(".", "big_dataset", "train_xml")
-IMAGE_PATH = os.path.join(".", "big_dataset", "train_plate")
-OUT_PATH = os.path.join(".", "out")
-JSON_PATH = os.path.join(".", "gaussian", "json")
+# XML_PATH = os.path.join(".", "big_dataset", "train_xml")
+# IMAGE_PATH = os.path.join(".", "big_dataset", "train_plate")
+# OUT_PATH = os.path.join(".", "out")
+JSON_PATH = os.path.join(".", "mixed", "json")
 
 CLASSES = ["blue4", "red4"]
 CLASSES_MAP = {"blue4": 0, "red4": 1}
