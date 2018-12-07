@@ -1,0 +1,36 @@
+{
+    "file": ".\\all_drive\\red_drive_4250.jpg",
+    "image_size": [
+        {
+            "width": 1920,
+            "height": 1080,
+            "depth": 3
+        }
+    ],
+    "categories": [
+        {
+            "class_id": 1,
+            "name": "red4"
+        },
+        {
+            "class_id": 1,
+            "name": "red4"
+        }
+    ],
+    "annotations": [
+        {
+            "class_id": 1,
+            "left": 738,
+            "top": 624,
+            "width": 220,
+            "height": 255
+        },
+        {
+            "class_id": 1,
+            "left": 91,
+            "top": 660,
+            "width": 292,
+            "height": 307
+        }
+    ]
+}

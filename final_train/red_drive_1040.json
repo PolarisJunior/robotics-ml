@@ -1,0 +1,47 @@
+{
+    "file": ".\\all_drive\\red_drive_1040.jpg",
+    "image_size": [
+        {
+            "width": 1920,
+            "height": 1080,
+            "depth": 3
+        }
+    ],
+    "categories": [
+        {
+            "class_id": 1,
+            "name": "red4"
+        },
+        {
+            "class_id": 1,
+            "name": "red4"
+        },
+        {
+            "class_id": 1,
+            "name": "red4"
+        }
+    ],
+    "annotations": [
+        {
+            "class_id": 1,
+            "left": 790,
+            "top": 395,
+            "width": 326,
+            "height": 263
+        },
+        {
+            "class_id": 1,
+            "left": 1187,
+            "top": 256,
+            "width": 59,
+            "height": 202
+        },
+        {
+            "class_id": 1,
+            "left": 357,
+            "top": 275,
+            "width": 113,
+            "height": 300
+        }
+    ]
+}

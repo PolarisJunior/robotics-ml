@@ -1,0 +1,47 @@
+{
+    "file": ".\\all_drive\\red_drive_1980.jpg",
+    "image_size": [
+        {
+            "width": 1920,
+            "height": 1080,
+            "depth": 3
+        }
+    ],
+    "categories": [
+        {
+            "class_id": 1,
+            "name": "red4"
+        },
+        {
+            "class_id": 1,
+            "name": "red4"
+        },
+        {
+            "class_id": 1,
+            "name": "red4"
+        }
+    ],
+    "annotations": [
+        {
+            "class_id": 1,
+            "left": 911,
+            "top": 479,
+            "width": 98,
+            "height": 100
+        },
+        {
+            "class_id": 1,
+            "left": 822,
+            "top": 473,
+            "width": 44,
+            "height": 83
+        },
+        {
+            "class_id": 1,
+            "left": 1042,
+            "top": 477,
+            "width": 39,
+            "height": 79
+        }
+    ]
+}

@@ -1,0 +1,25 @@
+{
+    "file": ".\\all_drive\\blue_drive_55.jpg",
+    "image_size": [
+        {
+            "width": 1920,
+            "height": 1080,
+            "depth": 3
+        }
+    ],
+    "categories": [
+        {
+            "class_id": 0,
+            "name": "blue4"
+        }
+    ],
+    "annotations": [
+        {
+            "class_id": 0,
+            "left": 1394,
+            "top": 643,
+            "width": 163,
+            "height": 128
+        }
+    ]
+}

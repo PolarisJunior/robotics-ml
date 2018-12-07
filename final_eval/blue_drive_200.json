@@ -1,0 +1,47 @@
+{
+    "file": ".\\all_drive\\blue_drive_200.jpg",
+    "image_size": [
+        {
+            "width": 1920,
+            "height": 1080,
+            "depth": 3
+        }
+    ],
+    "categories": [
+        {
+            "class_id": 0,
+            "name": "blue4"
+        },
+        {
+            "class_id": 0,
+            "name": "blue4"
+        },
+        {
+            "class_id": 0,
+            "name": "blue4"
+        }
+    ],
+    "annotations": [
+        {
+            "class_id": 0,
+            "left": 956,
+            "top": 393,
+            "width": 223,
+            "height": 178
+        },
+        {
+            "class_id": 0,
+            "left": 1270,
+            "top": 317,
+            "width": 68,
+            "height": 123
+        },
+        {
+            "class_id": 0,
+            "left": 842,
+            "top": 346,
+            "width": 59,
+            "height": 141
+        }
+    ]
+}
