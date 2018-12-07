@@ -26,7 +26,7 @@ from utils import visualization_utils as vis_util
 SHOW_VISUALS = True
 
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
-PATH_TO_FROZEN_GRAPH = os.path.join(".", "anni_exports", "model_1922", 'frozen_inference_graph.pb')
+PATH_TO_FROZEN_GRAPH = os.path.join(".", "final_exports", "model_1522", 'frozen_inference_graph.pb')
 
 # List of the strings that is used to add correct label for each box.
 PATH_TO_LABELS = os.path.join('data', 'robot_label_map.pbtxt')

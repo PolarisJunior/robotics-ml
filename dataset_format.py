@@ -4,10 +4,11 @@ import xmltodict
 import os
 import json
 
-JSON_PATH = os.path.join(".", "test_IMG", "json")
+
 if __name__ == "__main__":
-    XML_PATH = os.path.join(".", "test_IMG", "XML")
-    IMAGE_PATH = os.path.join(".", "test_IMG")
+    JSON_PATH = os.path.join(".", "combined_jsons")
+    XML_PATH = os.path.join(".", "combined_xmls")
+    IMAGE_PATH = os.path.join(".", "all_drive")
     OUT_PATH = JSON_PATH
 
 
@@ -17,8 +18,10 @@ CLASS_IDS = [0, 1]
 CLASS_IDS_MAP = { 0: "blue4", 1: "red4" }
 
 def class_name_fix(class_name):
-    if class_name == "blue4ww":
+    if class_name == "blue4ww" or class_name == "blue":
         return "blue4"
+    if class_name == "redw" or class_name == "red":
+        return "red4"
     return class_name
     pass
 
