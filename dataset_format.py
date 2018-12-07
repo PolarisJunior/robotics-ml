@@ -4,10 +4,12 @@ import xmltodict
 import os
 import json
 
-# XML_PATH = os.path.join(".", "big_dataset", "train_xml")
-# IMAGE_PATH = os.path.join(".", "big_dataset", "train_plate")
-# OUT_PATH = os.path.join(".", "out")
-JSON_PATH = os.path.join(".", "mixed", "json")
+JSON_PATH = os.path.join(".", "test_IMG", "json")
+if __name__ == "__main__":
+    XML_PATH = os.path.join(".", "test_IMG", "XML")
+    IMAGE_PATH = os.path.join(".", "test_IMG", "train_plate")
+    OUT_PATH = JSON_PATH
+
 
 CLASSES = ["blue4", "red4"]
 CLASSES_MAP = {"blue4": 0, "red4": 1}
@@ -72,6 +74,9 @@ def file_name_to_json(file_name, xml_path=None):
 
 
 def convert():
+    print("%s XML DIR" % XML_PATH)
+    print("%s JSON DIR" % JSON_PATH)
+    print("Converting XML Files to JSON")
     for file_name in os.listdir(XML_PATH):
         with open(os.path.join(XML_PATH, file_name), "r") as f:
             xml_string = f.read()
@@ -82,4 +87,5 @@ def convert():
             f.write(json.dumps(json_string, indent=4))
         pass
 
-# convert()
+if __name__ == "__main__":
+    convert()
