@@ -7,7 +7,7 @@ import json
 JSON_PATH = os.path.join(".", "test_IMG", "json")
 if __name__ == "__main__":
     XML_PATH = os.path.join(".", "test_IMG", "XML")
-    IMAGE_PATH = os.path.join(".", "test_IMG", "train_plate")
+    IMAGE_PATH = os.path.join(".", "test_IMG")
     OUT_PATH = JSON_PATH
 
 
