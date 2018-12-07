@@ -7,8 +7,9 @@ import numpy as np
 
 RECORD_PATH = os.path.join(".", "records")
 # RECORD_FILE_NAME = "robot_plates.record"
-EVAL_RECORD_FILE_NAME = "mixed_robot_plates_eval.record"
-TRAIN_RECORD_FILE_NAME = "mixed_robot_plates_train.record"
+EVAL_RECORD_FILE_NAME = "new_robot_plates_eval.record"
+TRAIN_RECORD_FILE_NAME = "new_robot_plates_train.record"
+TEST_RECORD_FILE_NAME = "new_robot_plates_test.record"
 
 def get_box_corners(box_dict):
     return {
@@ -99,7 +100,7 @@ def convert_files_to_record(train_size=5000, eval_size=250):
     writer.close()
     pass
 
-def convert_json_files_to_record(train_size=5000, eval_size=250):
+def convert_json_files_to_record(train_size=5000, eval_size=250, test_size=250):
     assert(len(os.listdir(JSON_PATH)) >= train_size + eval_size)
     file_names = os.listdir(JSON_PATH)
 
@@ -119,6 +120,16 @@ def convert_json_files_to_record(train_size=5000, eval_size=250):
 
     print("Creating n = {} Eval Record".format(eval_size))
     writer = tf.python_io.TFRecordWriter(os.path.join(RECORD_PATH, EVAL_RECORD_FILE_NAME))
+    for idx in eval_indices:
+        file_name = file_names[idx]
+        j = json.load(open(os.path.join(JSON_PATH, file_name)))
+        tf_example = json_to_record(j)
+        writer.write(tf_example.SerializeToString())
+        pass
+    writer.close()
+
+    print("Creating n = {} Test Record".format(test_size))
+    writer = tf.python_io.TFRecordWriter(os.path.join(RECORD_PATH, TEST_RECORD_FILE_NAME))
     for idx in eval_indices:
         file_name = file_names[idx]
         j = json.load(open(os.path.join(JSON_PATH, file_name)))
