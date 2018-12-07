@@ -14,3 +14,10 @@ pip install pycocotools
 
 # From tensorflow/models/research/
 protoc object_detection/protos/*.proto --python_out=.
+
+models/research/object_detection/utils/object_detection_evaluation.py", line 290, in evaluate
+category_name = unicode(category_name, 'utf-8')
+NameError: name 'unicode' is not defined
+
+replace this: category_name = unicode(category_name, 'utf-8')
+to this: category_name = str(category_name, 'utf-8')
