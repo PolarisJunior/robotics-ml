@@ -5,12 +5,12 @@ import tensorflow as tf
 import io
 import numpy as np
 
-JSON_PATH = os.path.join(".", "final_test")
+JSON_PATH = os.path.join(".", "out")
 RECORD_PATH = os.path.join(".", "records")
 # RECORD_FILE_NAME = "robot_plates.record"
-EVAL_RECORD_FILE_NAME = "final_robot_plates_eval.record"
-TRAIN_RECORD_FILE_NAME = "final_robot_plates_train.record"
-TEST_RECORD_FILE_NAME = "final_robot_plates_test.record"
+EVAL_RECORD_FILE_NAME = "nabla_robot_plates_eval.record"
+TRAIN_RECORD_FILE_NAME = "nabla_robot_plates_train.record"
+TEST_RECORD_FILE_NAME = "nabla_robot_plates_test.record"
 
 def get_box_corners(box_dict):
     return {
@@ -101,8 +101,8 @@ def convert_files_to_record(train_size=5000, eval_size=250):
     writer.close()
     pass
 
-def convert_json_files_to_record(train_size=0, eval_size=0, test_size=100):
-    assert(len(os.listdir(JSON_PATH)) >= train_size + eval_size)
+def convert_json_files_to_record(train_size=5000, eval_size=250, test_size=250):
+    assert(len(os.listdir(JSON_PATH)) >= train_size + eval_size + test_size)
     file_names = os.listdir(JSON_PATH)
 
     arrangement = np.arange(0, len(file_names), 1, dtype="int")
@@ -110,7 +110,7 @@ def convert_json_files_to_record(train_size=0, eval_size=0, test_size=100):
 
     train_indices = arrangement[:train_size]
     eval_indices = arrangement[train_size:train_size + eval_size]
-    test_indices = arrangement[train_size + eval_size:test_size]
+    test_indices = arrangement[train_size + eval_size:test_size + train_size + eval_size]
 
     if train_size > 0:
         print("Creating n = {} Training Record".format(train_size))
